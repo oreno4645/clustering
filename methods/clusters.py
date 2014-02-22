@@ -193,14 +193,14 @@ def drawnode( draw, clust, x, y, scaling, labels ) :
 		draw.line( ( x, top + left_height / 2, x, bottom - right_height / 2 ), fill=( 255, 0, 0 ) ) 	
 
 		# 左側のアイテムへの水平な直線
-		draw.line( ( x, top + left_height / 2, x + line_length, bottom + right_height / 2 ), fill = ( 255, 0, 0 ) )
+		draw.line( ( x, top + left_height / 2, x + line_length, top + left_height / 2 ), fill = ( 255, 0, 0 ) )
 
 		# 右側のアイテムへの水平な直線
 		draw.line( ( x, bottom - right_height / 2, x + line_length, bottom - right_height / 2 ), fill = ( 255, 0, 0 ) )
 
 		# 左右のノードたちを描く関数を呼び出す
-		drawnode( draw,  clust.left, x + line_length,    top + left_height,  scaling, labels )
-		drawnode( draw, clust.right, x + line_length, bottom - right_height, scaling, labels )
+		drawnode( draw,  clust.left, x + line_length,    top + left_height / 2,  scaling, labels )
+		drawnode( draw, clust.right, x + line_length, bottom - right_height / 2, scaling, labels )
 
 	else :
 		# 終点であればアイテムのラベルを描く
