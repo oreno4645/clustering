@@ -1,6 +1,6 @@
 from math import sqrt
 
-def peason( v1, v2) :
+def pearson( v1, v2) :
 
 	sum1 = sum(v1)
 	sum2 = sum(v2) 
