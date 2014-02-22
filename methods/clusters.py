@@ -29,7 +29,7 @@ def readfile(filename):
 		rownames.append(p[0])
 		data.append([float(x) for x in p[1:]])
 
-	
+		
 	return rownames, colnames, data
 
 
@@ -56,7 +56,7 @@ def pearson(v1,v2):
 
 
 def hcluster(rows, distance = pearson):
-
+	
 	distances = {}
 	currentclustid = -1
 	# クラスタは最初は行たち
@@ -72,7 +72,7 @@ def hcluster(rows, distance = pearson):
 		for i in range(len(clust)):
 			for j in range(i + 1, len(clust)):
 				if (clust[i].id, clust[j].id) not in distances:
-					distances[(clust[i].id, clust[j].id)] = distances[(clust[i].vec, clust[j].vec)]	
+					distances[(clust[i].id, clust[j].id)] = distance(clust[i].vec, clust[j].vec)	
 			
 				d = distances[(clust[i].id, clust[j].id)]
 
@@ -86,9 +86,9 @@ def hcluster(rows, distance = pearson):
 
 			for i in range(len(clust[0].vec))]
 		# 新たなクラスタを作る				
-		newcluster = bicluster(mergevec, left = clust[lowstpair[0]],
+		newcluster = bicluster(mergevec, left = clust[lowestpair[0]],
 					right = clust[lowestpair[1]],
-					distane = closest, id = currentclustid)
+					distance = closest, id = currentclustid)
 	
 		# 元のセットではないクラスタのIDは負にする
 		currentclustid -= 1
