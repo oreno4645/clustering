@@ -116,7 +116,7 @@ def printclust(clust, labels = None, n = 0):
 	
 	# 右と左の枝を表示する
 	if clust.left != None: printclust(clust.left, labels = labels, n = n + 1)
-	if clust.right != None: printclust(clust.left, labels = labels, n = n + 1)
+	if clust.right != None: printclust(clust.right, labels = labels, n = n + 1)
 
 
 		
