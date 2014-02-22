@@ -1,5 +1,6 @@
 from math import sqrt
-def pearson(v1,v2):
+
+def peason( v1, v2) :
 
 	sum1 = sum(v1)
 	sum2 = sum(v2) 
@@ -15,4 +16,5 @@ def pearson(v1,v2):
 	if den == 0: return 0
 
 
-	return 1.0 -num /den
+	return 1.0 - num /den
+
