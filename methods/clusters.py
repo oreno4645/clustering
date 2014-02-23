@@ -283,3 +283,70 @@ def kcluster( rows, labels, distance=pearson, k = 4 ) :
 				clusters[i] = avgs
 	
 		return bestmatches
+
+
+##
+# アイテム間の距離と実際の距離をスケールダウンさせて調整する
+##
+
+def scaledown( data, distance=pearson, rate = 0.01 ) :
+	data_num = len( data )
+	print data_num
+
+	# アイテムのすべての組の実際の距離
+	realdist = [ [ distance( data[i], data[j] ) for j in range( data_num ) ] for i in range( 0, data_num ) ]
+	outersum = 0.0
+
+	# 2次元上にランダムに配置するように初期化する
+	location = [ [ random.random(), random.random() ] for i in range( data_num ) ]
+	fakedist = [ [ 0.0 for j in range( data_num ) ] for i in range( data_num ) ]
+
+	lasterror = None
+	for m in range( 0, 1000 ) :
+		# 予測距離を測る
+		for i in range( data_num ) :
+			for j in range( data_num ) :
+				fakedist[i][j] = sqrt( sum( [pow(location[i][x] - location[j][x], 2) for x in range( len( location[i] ) ) ] ) )
+		
+		# ポイントの移動
+		grad = [ [ 0.0, 0.0 ] for i in range( data_num ) ]
+
+		totalerror = 0
+		for k in range( data_num ) :
+			for j in range( data_num ) :
+				if j == k : continue
+				# 誤差は距離の差の百分率
+				errorterm = ( fakedist[j][k] - realdist[j][k] ) / realdist[j][k]
+
+				# 他のポイントへの誤差に比例してそれぞれのポイントを
+				# 近づけたり遠ざけたりする必要がある
+				grad[k][0] += ( ( location[k][0] - location[j][0] ) / fakedist[j][k] ) * errorterm
+				grad[k][1] += ( ( location[k][1] - location[j][1] ) / fakedist[j][k] ) * errorterm
+
+				# 誤差の合計を記録
+				totalerror += abs( errorterm )
+		print totalerror
+
+		# ポイントを移動することで誤差が悪化したら終了
+		if lasterror and lasterror < totalerror : break	
+		lasterror = totalerror
+	
+		# 学習率と傾斜を掛けあわせてそれぞれのポイントを移動
+		for k in range( data_num ) :
+			location[k][0] -= rate * grad[k][0]
+			location[k][1] -= rate * grad[k][1]
+
+	return location	
+
+##
+# 二次元でアイテム間の距離を描写
+##
+
+def draw2d( data, labels, jpeg="mds2d.jpg" ) :
+	image = Image.new( 'RGB', ( 2000, 2000 ), ( 255, 255, 255 ) )
+	draw  = ImageDraw.Draw( image )
+	for i in range( len( data ) ) :
+		x = ( data[i][0] + 0.5 ) * 1000
+		y = ( data[i][1] + 0.5 ) * 1000
+		draw.text( ( x, y ), labels[i], ( 0, 0, 0 ) )
+	image.save( jpeg, 'JPEG' ) 
