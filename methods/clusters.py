@@ -26,14 +26,48 @@ def readfile(filename):
 	data = []
 	
 	for line in lines[1:]:
-
-		p = line.strip().split('\t')
+		# print line
+		p= line.strip().split('\t')
 		
 		rownames.append(p[0])
 		data.append([float(x) for x in p[1:]])
+	
+
+	# それぞれの列の最大値取得
+	max_col = [m for m in range(len(data[0]))]
+	for l in range(len(data[0])):
+		col_method = []
+		for k in range(len(data)):
+
+			col_method.append(data[k][l])
+		
+		max_col[l] = max(col_method)
+
+	# 正規化 列の最大値で割る	
+	for l in range(len(data[0])):
+		
+		for k in range(len(data)):
+
+			col_method.append(data[k][l])
+		
+			data[k][l] = data[k][l] / max_col[l]
 
 		
 	return rownames, colnames, data
+
+def tanimoto(v1, v2):
+	c1, c2, shr = 0, 0, 0
+
+	for i in range(len(v1)):
+
+		if v1[i] != 0: c1 += 1 # v1に存在
+		if v2[i] != 0: c2 += 1 # v1に存在
+		if v1[i] != 0 and v2[i] != 0: shr +=1 # 両者に存在
+	
+	return 1.0 - ( float( shr ) / ( c1 + c2 - shr ))
+	
+
+
 
 
 
