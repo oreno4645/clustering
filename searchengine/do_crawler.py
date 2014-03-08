@@ -3,8 +3,10 @@
 
 import crawler
 
-pagelist = ['http://en.wikipedia.org/wiki/Main_Page']
+crawl = crawler.crawler( 'searchindex.db')
 
-crawler = crawler.crawler('')
+crawl.createindextables()
 
-crawler.crawl(pagelist)
+pages = ['http://en.wikipedia.org/wiki/Main_Page']
+
+crawl.crawl(pages)
