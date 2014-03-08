@@ -6,6 +6,9 @@ from BeautifulSoup import *
 from urlparse import urljoin
 from pysqlite2 import dbapi2 as sqlite
 
+# 無視すべき単語のリストをつくる
+ignorewords = set( ['the', 'of', 'to', 'and', 'a', 'in', 'is', 'it', 'as', 'for' ] )
+
 class crawler:
 	# データベースの名前でクローラを初期化する
 	def __init__(self, dbname):
@@ -74,14 +77,14 @@ class crawler:
 		if fetch_url != None:
 			# URLが実際にクロールされているかどうかチェック	
 			value = self.con.execute(
-				"select * from wordlocation where urlid = %d" % u[0] ).fetchone()
+				"select * from wordlocation where urlid = %d" % fetch_url[0] ).fetchone()
 			if value != None: return True
 		return False
 
 	# 2つのページの間にリンクを付け加える
 	def addlinkref( self, urlFrom, urlTo, linkText ):
 		words = self.separatewords( linkText )
-		fromid = self.getentryid( 'urllist', 'url', urlForm )
+		fromid = self.getentryid( 'urllist', 'url', urlFrom )
 		toid = self.getentryid( 'urllist', 'url', urlTo )
 		if fromid == toid: return
 		cur = self.con.execute( "insert into link( fromid, toid ) values ( %d, %d )" % ( fromid, toid ) )
