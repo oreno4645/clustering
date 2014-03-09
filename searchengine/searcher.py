@@ -14,6 +14,10 @@ class searcher:
 	def __del__( self ):
 
 		self.con.close()
+	
+	def dbcommit(self):
+		self.con.commit()
+
 
 	def getmatchrows( self, q ):
 
@@ -26,7 +30,7 @@ class searcher:
 		# 空白で単語を分ける
 		words = q.split(' ')
 		tablenumber = 0
-		print( words )
+		# print( words )
 
 		for word in words:
 			
@@ -44,35 +48,40 @@ class searcher:
 					clauselist += ' and '
 					clauselist += 'w%d.urlid = w%d.urlid and ' % ( tablenumber - 1, tablenumber )
 
-				fieldlist += ', w%d.location' % tablenumber
+				fieldlist += ' ,w%d.location' % tablenumber
 				tablelist += 'wordlocation w%d' % tablenumber
 				clauselist += 'w%d.wordid = %d' % ( tablenumber, wordid )
 				tablenumber += 1
-					
+		
+			
 		# 分割されたパーツからクエリを構築
 		fullquery = 'select %s from %s where %s' % ( fieldlist, tablelist, clauselist )
 		# print fullquery
+
 		# sys.exit()
 		cur = self.con.execute( fullquery )
+		# print cur
 		rows = [ row for row in cur]
-			
+		# print rows	
 		# print wordids
 		return rows, wordids
 
 	def getscoredlist( self, rows, wordids ):
 
-		totalscores = dict([( row[0],0) for row in rows ])
+		totalscores = dict( [ ( row[0], 0 ) for row in rows ] )
 
 		# ここには後ほどスコアリング関数を入れる
-		weights = [ ( 1.0, self.frequencyscore( rows ) ), 1.5, self.locationscore( rows ) ]
-
+		# weights = [ ( 1.0, self.frequencyscore( rows ) ) ]
+		weights = [ ( 1.0, self.frequencyscore( rows ) ), ( 1.0, self.locationscore( rows ) ), ( 1.0, self.pagerankscore( rows )) ]
+		# print weights
+		# print totalscores
 		for ( weight, scores )  in weights:
 
 			for url in totalscores:	
 
-				totalscores[ url ] += weight
+				totalscores[ url ] += weight * scores[ url ]
 
-			return totalscores
+		return totalscores
 
 	def geturlname( self, id ):
 
@@ -83,10 +92,10 @@ class searcher:
 	
 		rows, wordids = self.getmatchrows( q )
 		scores = self.getscoredlist( rows, wordids ) 
-		print scores
+		# print scores
 		rankedscores = sorted([( score, url ) for ( url, score ) in scores.items() ], reverse = 1)
 
-		for ( score, urlid ) in rankedscores[0:50]:
+		for ( score, urlid ) in rankedscores[0:10]:
 			
 			print '%f\t%s' % ( score, self.geturlname( urlid )) 
 			
@@ -96,14 +105,19 @@ class searcher:
 		vsmall = 0.0001 # 0で除算することによるエラーを回避する
 		if smallIsBetter:
 	
-			minscore = min( scores.values() ) 
+			minscore = min( scores.values() )
+
+			# print minscore 
 			return dict([( u, float( minscore ) / max ( vsmall, l )) for ( u, l ) in scores.items() ])
 
 		else:
 
 			maxscore = max( scores.values() )
+			
+			# print maxscore 
 			if maxscore == 0: maxscore = vsmall
 			
+			# print scores.items()
 			return dict([( u, float( c ) / maxscore ) for ( u, c ) in scores.items() ])
 
 
