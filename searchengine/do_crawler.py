@@ -5,8 +5,8 @@ import crawler
 
 crawl = crawler.crawler( 'searchindex.db')
 
-crawl.createindextables()
+# dbを作り直す場合はコメントアウトを削除
+# crawl.createindextables()
 
-pages = ['http://en.wikipedia.org/wiki/Main_Page']
-
+pages = ['http://time.com/']
 crawl.crawl(pages)
