@@ -9,5 +9,4 @@ crawl = crawler.crawler( 'searchindex.db')
 # crawl.createindextables()
 
 pages = ['http://time.com/']
-
 crawl.crawl(pages)
